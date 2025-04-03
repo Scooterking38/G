@@ -1,0 +1,67 @@
+name: Comprehensive Vulnerability Scanner
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'The target URL to scan (e.g., https://example.com)'
+        required: true
+        default: 'https://example.com'
+      target_domain:
+        description: 'The target domain or IP for network scanning (e.g., example.com or 192.168.1.1)'
+        required: true
+        default: 'example.com'
+
+jobs:
+  zap_scan:
+    name: OWASP ZAP Full Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.4.0
+        with:
+          target: ${{ github.event.inputs.target_url }}
+          rules_file_name: 'zap-rules.conf'
+          cmd_options: '-config api.disablekey=true'
+      
+      - name: Archive ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: zap-report.html
+
+  nikto_scan:
+    name: Nikto Web Server Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Nikto scan via Docker
+        run: |
+          docker pull sullo/nikto:latest
+          docker run --rm sullo/nikto -h "${{ github.event.inputs.target_url }}" -o nikto-report.txt -Format txt
+      
+      - name: Archive Nikto Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: nikto-report
+          path: nikto-report.txt
+
+  nmap_scan:
+    name: Nmap Network Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Nmap
+        run: sudo apt-get update && sudo apt-get install -y nmap
+
+      - name: Run Nmap scan
+        run: nmap -sV -oN nmap-report.txt ${{ github.event.inputs.target_domain }}
+      
+      - name: Archive Nmap Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: nmap-report
+          path: nmap-report.txt
