@@ -41,8 +41,8 @@ jobs:
     steps:
       - name: Run Nikto scan via Docker
         run: |
-          docker pull sullo/nikto:latest
-          docker run --rm sullo/nikto -h "${{ github.event.inputs.target_url }}" -o nikto-report.txt -Format txt
+          docker pull heywoodlh/nikto:latest
+          docker run --rm heywoodlh/nikto -h "${{ github.event.inputs.target_url }}" -o nikto-report.txt -Format txt
       
       - name: Archive Nikto Report
         uses: actions/upload-artifact@v4
