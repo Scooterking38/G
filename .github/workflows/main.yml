@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Run OWASP ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.4.0
@@ -30,7 +30,7 @@ jobs:
           cmd_options: '-config api.disablekey=true'
       
       - name: Archive ZAP Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: zap-report
           path: zap-report.html
@@ -45,7 +45,7 @@ jobs:
           docker run --rm sullo/nikto -h "${{ github.event.inputs.target_url }}" -o nikto-report.txt -Format txt
       
       - name: Archive Nikto Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nikto-report
           path: nikto-report.txt
@@ -61,7 +61,7 @@ jobs:
         run: nmap -sV -oN nmap-report.txt ${{ github.event.inputs.target_domain }}
       
       - name: Archive Nmap Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nmap-report
           path: nmap-report.txt
